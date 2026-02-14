@@ -21,6 +21,30 @@
 #include <librealsense2/rs.hpp>
 #include <librealsense2/rsutil.h>
 
+// ---------------------------------------------------------------------------
+// Compat shims for SDK 2.56.5 (these enums/types were added in 2.56.6).
+// The camera hardware never produces these stream types on 2.56.5, so the
+// values chosen here are arbitrary and unreachable at runtime.
+// ---------------------------------------------------------------------------
+#ifndef RS2_STREAM_SAFETY
+#define RS2_STREAM_SAFETY                         static_cast<rs2_stream>(200)
+#define RS2_STREAM_LABELED_POINT_CLOUD            static_cast<rs2_stream>(201)
+#define RS2_STREAM_OCCUPANCY                      static_cast<rs2_stream>(202)
+#endif
+#ifndef RS2_FRAME_METADATA_OCCUPANCY_GRID_ROWS
+#define RS2_FRAME_METADATA_OCCUPANCY_GRID_ROWS    static_cast<rs2_frame_metadata_value>(200)
+#define RS2_FRAME_METADATA_OCCUPANCY_GRID_COLUMNS static_cast<rs2_frame_metadata_value>(201)
+#endif
+
+// Stub types for labeled_points / occupancy if the SDK doesn't define them
+namespace rs2 {
+#if RS2_API_VERSION < ((2 * 10000) + (56 * 100) + 6)
+  class labeled_points : public rs2::points {
+  public:
+    using rs2::points::points;
+  };
+#endif
+}
 
 namespace realsense2_camera
 {
